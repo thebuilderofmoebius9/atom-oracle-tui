@@ -1,5 +1,7 @@
 import { spawn } from "node:child_process";
+import { existsSync } from "node:fs";
 import { appendFile, mkdir, readFile } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 
 export type ParsedCommand =
@@ -25,7 +27,25 @@ export interface CommandResult {
   ok: boolean;
 }
 
-export const REPO_ROOT = path.resolve(new URL("../../..", import.meta.url).pathname);
+export const REPO_ROOT = findRepoRoot(path.dirname(fileURLToPath(import.meta.url)));
+
+function findRepoRoot(start: string): string {
+  if (process.env.ATOM_TUI_REPO_ROOT) {
+    return path.resolve(process.env.ATOM_TUI_REPO_ROOT);
+  }
+
+  let current = start;
+  while (true) {
+    if (existsSync(path.join(current, ".git"))) {
+      return current;
+    }
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return path.resolve(start, "..");
+    }
+    current = parent;
+  }
+}
 
 const HELP = [
   "## Atom TUI commands",
@@ -34,7 +54,7 @@ const HELP = [
   "- `/files [query]` - list repo files",
   "- `/grep <pattern>` - ripgrep search",
   "- `/read <relative-path> [lines]` - preview a repo file",
-  "- `/test` - run `cargo test --lib`",
+  "- `/test` - run project tests",
   "- `/note <text>` - append a local note",
   "- `/maw-ls` - list live Maw/tmux panes",
   "- `/maw-peek <target>` - quick latest-output glance",
@@ -124,7 +144,7 @@ export async function executeCommand(command: ParsedCommand): Promise<CommandRes
     case "read":
       return readPreview(command.file, command.lines);
     case "test":
-      return runCargoTest();
+      return runProjectTest();
     case "note":
       return note(command.text);
     case "maw-ls":
@@ -231,10 +251,13 @@ async function readPreview(relativeFile: string, lineLimit: number): Promise<Com
   }
 }
 
-async function runCargoTest(): Promise<CommandResult> {
-  const result = await run("cargo", ["test", "--lib"], { timeoutMs: 120_000 });
+async function runProjectTest(): Promise<CommandResult> {
+  const hasCargo = existsSync(path.join(REPO_ROOT, "Cargo.toml"));
+  const result = hasCargo
+    ? await run("cargo", ["test", "--lib"], { timeoutMs: 120_000 })
+    : await run("bun", ["test"], { timeoutMs: 120_000 });
   const output = [result.stdout, result.stderr].filter(Boolean).join("\n").split("\n").slice(-160).join("\n");
-  return { title: "Cargo Test", body: ["```text", output, "```"].join("\n"), ok: result.code === 0 };
+  return { title: hasCargo ? "Cargo Test" : "Bun Test", body: ["```text", output, "```"].join("\n"), ok: result.code === 0 };
 }
 
 async function note(text: string): Promise<CommandResult> {

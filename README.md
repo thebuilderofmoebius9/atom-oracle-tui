@@ -8,7 +8,8 @@ This machine currently has Node 18, while `pi-tui` declares Node `>=22.19.0`.
 Use Bun here:
 
 ```bash
-cd tools/atom-tui
+git clone https://github.com/thebuilderofmoebius9/atom-oracle-tui
+cd atom-oracle-tui
 bun install
 bun run start
 ```
@@ -26,7 +27,7 @@ bun run once /status
 - `/files [query]` - list repo files, optionally filtered
 - `/grep <pattern>` - search source-like files with ripgrep
 - `/read <relative-path> [lines]` - preview a non-secret repo file
-- `/test` - run `cargo test --lib`
+- `/test` - run project tests (`cargo test --lib` in Atom repo, `bun test` in standalone clone)
 - `/note <text>` - append a local note under `ψ/active/atom-tui/notes.jsonl`
 - `/maw-ls` - list live Maw/tmux panes
 - `/maw-peek <target>` - quick latest-output glance from a pane

@@ -29,9 +29,9 @@ describe("parseCommand", () => {
 
 describe("executeCommand", () => {
   test("reads a safe repo file", async () => {
-    const result = await executeCommand({ name: "read", file: "Cargo.toml", lines: 8 });
+    const result = await executeCommand({ name: "read", file: "README.md", lines: 8 });
     expect(result.ok).toBe(true);
-    expect(result.body).toContain("[package]");
+    expect(result.body).toContain("#");
   });
 
   test("blocks secret-like paths", async () => {

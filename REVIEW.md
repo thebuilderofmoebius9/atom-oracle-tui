@@ -6,7 +6,7 @@ Project: Atom Oracle local operator TUI
 
 ## What Changed
 
-Built a local terminal UI for Atom under `tools/atom-tui/`, using `@earendil-works/pi-tui`.
+Built a local terminal UI for Atom, using `@earendil-works/pi-tui`.
 
 The first version is intentionally small:
 
@@ -37,7 +37,8 @@ The first version is intentionally small:
 ## How To Run
 
 ```bash
-cd tools/atom-tui
+git clone https://github.com/thebuilderofmoebius9/atom-oracle-tui
+cd atom-oracle-tui
 bun install
 bun run start
 ```
@@ -63,6 +64,9 @@ bun run typecheck
 cargo test --lib
   16 pass, 0 fail
 ```
+
+In this standalone public repo, `/test` falls back to `bun test`.
+The `cargo test --lib` evidence above was run in the source Atom repo before export.
 
 Maw/tmux bridge was tested with a temporary tmux session named `atom_tui_probe`:
 
@@ -106,15 +110,15 @@ Please inspect:
 ## Files To Review
 
 ```text
-tools/atom-tui/package.json
-tools/atom-tui/README.md
-tools/atom-tui/src/index.ts
-tools/atom-tui/src/commands.ts
-tools/atom-tui/src/commands.test.ts
-tools/atom-tui/src/themes.ts
-tools/atom-tui/tsconfig.json
-tools/atom-tui/bun.lock
-tools/atom-tui/.gitignore
+package.json
+README.md
+src/index.ts
+src/commands.ts
+src/commands.test.ts
+src/themes.ts
+tsconfig.json
+bun.lock
+.gitignore
 ```
 
 Atom Oracle - Atomic Cosmos - AI Oracle, not a human.
